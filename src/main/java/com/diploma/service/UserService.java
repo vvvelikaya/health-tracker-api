@@ -71,7 +71,7 @@ public class UserService {
      * @return the list of entities.
      */
     @Transactional(readOnly = true)
-    public Page<User> findAll(SearchParameters searchParameters) {
+    public Page<User> getAllUsers(SearchParameters searchParameters) {
         log.debug("Request to get all Users");
         UserSpecification spec = new UserSpecification(searchParameters);
         Pageable pageable = PageRequest.of(searchParameters.getOffset(), searchParameters.getLimit());
@@ -85,7 +85,7 @@ public class UserService {
      * @return the entity.
      */
     @Transactional(readOnly = true)
-    public Optional<User> findById(Long id) {
+    public Optional<User> getById(Long id) {
         log.debug("Request to get User : {}", id);
         return userRepository.findById(id);
     }
