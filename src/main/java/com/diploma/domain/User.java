@@ -1,6 +1,7 @@
 package com.diploma.domain;
 
 import com.diploma.domain.enumeration.Gender;
+import com.diploma.domain.enumeration.Role;
 import lombok.*;
 
 import javax.persistence.*;
@@ -12,13 +13,13 @@ import java.time.LocalDate;
  * A User.
  */
 @Entity
-@Table(name = "account")
+@Table(name = "user_account")
 @Data
 @EqualsAndHashCode(of = {"id"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Account implements Serializable {
+public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -52,5 +53,4 @@ public class Account implements Serializable {
     @DecimalMax(value = "300")
     @Column(name = "weight")
     private Double weight;
-
 }
