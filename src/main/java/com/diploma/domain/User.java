@@ -53,4 +53,14 @@ public class User implements Serializable {
     @DecimalMax(value = "300")
     @Column(name = "weight")
     private Double weight;
+
+    @NotNull
+    @NotBlank
+    @Column(name = "password")
+    private String password;
+
+//    @Enumerated
+    @Column(name = "role")
+//    @Builder.Default
+    private String role;
 }
