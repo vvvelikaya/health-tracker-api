@@ -24,7 +24,7 @@ import java.util.Optional;
  * REST controller for managing {@link User}.
  */
 @RestController
-@RequestMapping(value = "/api/users", consumes = "application/json", produces = "application/json")
+@RequestMapping(value = "/api/users")
 @RequiredArgsConstructor
 public class UserResource {
 
@@ -90,7 +90,7 @@ public class UserResource {
     public ResponseEntity<Page<User>> getAllUsers(@RequestBody SearchParametersDTO searchParametersDTO) {
         log.debug("REST request to get Accounts");
         SearchParameters searchParameters = searchParametersDTO.convertSearchParamsRequestToSearchParams();
-        Page<User> page = userService.findAll(searchParameters);
+        Page<User> page = userService.getAllUsers(searchParameters);
         return ResponseEntity.ok(page);
     }
 
@@ -103,7 +103,7 @@ public class UserResource {
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(@PathVariable Long id) {
         log.debug("REST request to get User : {}", id);
-        Optional<User> user = userService.findById(id);
+        Optional<User> user = userService.getById(id);
         return user.map(item -> ResponseEntity.ok().body(item)).orElseGet(() -> ResponseEntity.notFound().build());
     }
 

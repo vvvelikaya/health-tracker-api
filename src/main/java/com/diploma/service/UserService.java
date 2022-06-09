@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ public class UserService {
 
     private final Logger log = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     /**
      * Save a user.
@@ -33,6 +35,7 @@ public class UserService {
      */
     public User create(final User user) {
         log.debug("Request to save User : {}", user);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
