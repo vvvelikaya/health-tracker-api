@@ -1,13 +1,16 @@
 package com.diploma.repository;
 
-import com.diploma.domain.Account;
+import com.diploma.domain.User;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 /**
  * Spring Data SQL repository for the User entity.
  */
 @SuppressWarnings("unused")
 @Repository
-public interface AccountRepository extends JpaRepository<Account, Long>, JpaSpecificationExecutor<Account> {
+public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
+    Optional<User> findOneUserByEmail(String email);
 }

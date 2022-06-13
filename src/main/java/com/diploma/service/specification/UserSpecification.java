@@ -1,7 +1,8 @@
 package com.diploma.service.specification;
 
-import com.diploma.domain.Account;
+import com.diploma.domain.User;
 import com.diploma.service.SearchParameters;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -11,16 +12,13 @@ import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AccountSpecification implements Specification<Account> {
+@RequiredArgsConstructor
+public class UserSpecification implements Specification<User> {
 
     private final SearchParameters searchParameters;
 
-    public AccountSpecification(final SearchParameters searchParameters) {
-        this.searchParameters = searchParameters;
-    }
-
     @Override
-    public Predicate toPredicate(final Root<Account> root, final CriteriaQuery<?> query, final CriteriaBuilder criteriaBuilder) {
+    public Predicate toPredicate(final Root<User> root, final CriteriaQuery<?> query, final CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
         String nameKeyword = searchParameters.getNameKeyword();
         String cityKeyword = searchParameters.getSurnameKeyword();
