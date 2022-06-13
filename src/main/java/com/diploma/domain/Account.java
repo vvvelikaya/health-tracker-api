@@ -7,6 +7,7 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Set;
 
 /**
  * A User.
@@ -52,5 +53,8 @@ public class Account implements Serializable {
     @DecimalMax(value = "300")
     @Column(name = "weight")
     private Double weight;
+
+    @OneToMany(mappedBy = "record")
+    private Set<Record> records;
 
 }
