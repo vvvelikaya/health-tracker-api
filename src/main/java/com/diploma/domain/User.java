@@ -8,6 +8,8 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A User.
@@ -42,6 +44,11 @@ public class User implements Serializable {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    @NotNull
+    @NotBlank
+    @Column(name = "password")
+    private String password;
+
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
@@ -54,13 +61,12 @@ public class User implements Serializable {
     @Column(name = "weight")
     private Double weight;
 
-    @NotNull
-    @NotBlank
-    @Column(name = "password")
-    private String password;
-
-//    @Enumerated
     @Column(name = "role")
-//    @Builder.Default
-    private String role;
+    @Builder.Default
+    private String role = "ROLE_USER";
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private Set<Record> records = new HashSet<>();
+
 }
