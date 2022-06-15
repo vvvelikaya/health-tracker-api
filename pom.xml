@@ -22,6 +22,7 @@
         <postgresql.version>42.3.6</postgresql.version>
         <flyway-maven-plugin.version>8.5.12</flyway-maven-plugin.version>
         <maven-dependency-plugin.version>3.0.1</maven-dependency-plugin.version>
+        <spring-boot-maven-plugin.version>2.7.0</spring-boot-maven-plugin.version>
         <spring-boot.version>2.6.7</spring-boot.version>
         <lombok.version>1.18.24</lombok.version>
         <hibernate-validator.version>7.0.4.Final</hibernate-validator.version>
@@ -68,6 +69,11 @@
             <artifactId>java-jwt</artifactId>
             <version>3.19.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>2.3.2</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -77,7 +83,7 @@
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>${flyway-maven-plugin.version}</version>
                 <configuration>
-                    <url>${env.JDBC_DATABASE_URL}</url>
+                    <url>${JDBC_DATABASE_URL}</url>
                 </configuration>
             </plugin>
             <plugin>
@@ -95,6 +101,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot-maven-plugin.version}</version>
                 <configuration>
                     <mainClass>com.diploma.HealthTrackerApi</mainClass>
                 </configuration>
