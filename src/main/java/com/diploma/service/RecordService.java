@@ -22,6 +22,7 @@ import java.util.Optional;
 public class RecordService {
     private final Logger log = LoggerFactory.getLogger(RecordService.class);
     private final RecordRepository recordRepository;
+    private final UserService userService;
 
     /**
      * Save a record.
@@ -59,13 +60,14 @@ public class RecordService {
     /**
      * Get all the records.
      *
-     * @param searchParameters the pagination information.
+     * @param recordsParams the pagination information.
      * @return the list of entities.
      */
     @Transactional(readOnly = true)
-    public Page<Record> getAllRecords(SearchParameters searchParameters) {
+    public Page<Record> getAllRecords(RecordsParams recordsParams) {
         log.debug("Request to get all Records");
-        Pageable pageable = PageRequest.of(searchParameters.getOffset(), searchParameters.getLimit());
+        recordsParams.setUserId(userService.getCurrentUser().get().getId());
+        Pageable pageable = PageRequest.of(recordsParams.getOffset(), recordsParams.getLimit());
         return recordRepository.findAll(pageable);
     }
 

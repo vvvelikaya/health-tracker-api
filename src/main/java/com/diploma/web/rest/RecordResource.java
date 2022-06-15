@@ -1,8 +1,12 @@
 package com.diploma.web.rest;
 
 import com.diploma.domain.Record;
+import com.diploma.domain.User;
 import com.diploma.service.RecordService;
+import com.diploma.service.RecordsParams;
 import com.diploma.service.SearchParameters;
+import com.diploma.service.UserService;
+import com.diploma.service.dto.RecordsParamsDTO;
 import com.diploma.service.dto.SearchParametersDTO;
 import com.diploma.web.rest.errors.ProcessException;
 import com.diploma.web.rest.util.HeaderUtil;
@@ -12,11 +16,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.Principal;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -29,7 +37,9 @@ import java.util.Optional;
 public class RecordResource {
     private final Logger log = LoggerFactory.getLogger(RecordResource.class);
     private static final String ENTITY_NAME = "record";
+//    private final Authentication authentication;
     private final RecordService recordService;
+    private final UserService userService;
 
     /**
      * {@code POST  /} : Create a new record.
@@ -39,12 +49,14 @@ public class RecordResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping
-    public ResponseEntity<Record> createUser(@Valid @RequestBody Record record) throws URISyntaxException {
+    public ResponseEntity<Record> createRecord(@Valid @RequestBody Record record) throws URISyntaxException {
         log.debug("REST request to save Record : {}", record);
+        User currentUser = userService.getCurrentUser().get();
         if (record.getId() != null) {
             throw new ProcessException("A new record cannot already have an ID", HttpStatus.BAD_REQUEST);
         }
         Record result = recordService.create(record);
+        currentUser.getRecords().add(result);
         return ResponseEntity
                 .created(new URI("/api/records/" + result.getId()))
                 .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
@@ -82,14 +94,16 @@ public class RecordResource {
     /**
      * {@code GET  /} : get all the records.
      *
-     * @param searchParametersDTO the pagination information.
+     * @param recordsParamsDTO the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of records in body.
      */
     @GetMapping
-    public ResponseEntity<Page<Record>> getAllRecords(@RequestBody SearchParametersDTO searchParametersDTO) {
+    public ResponseEntity<Page<Record>> getAllRecords(@RequestBody RecordsParamsDTO recordsParamsDTO) {
         log.debug("REST request to get Records");
-        SearchParameters searchParameters = searchParametersDTO.convertSearchParamsRequestToSearchParams();
-        Page<Record> page = recordService.getAllRecords(searchParameters);
+        RecordsParams recordsParams = recordsParamsDTO.convertToRecordsParams();
+        Page<Record> page;
+        page = recordService.getAllRecords(recordsParams);
+
         return ResponseEntity.ok(page);
     }
 
