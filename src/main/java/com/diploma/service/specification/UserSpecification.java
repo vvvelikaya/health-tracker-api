@@ -20,24 +20,22 @@ public class UserSpecification implements Specification<User> {
     @Override
     public Predicate toPredicate(final Root<User> root, final CriteriaQuery<?> query, final CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
-        String nameKeyword = searchParameters.getNameKeyword();
-        String cityKeyword = searchParameters.getSurnameKeyword();
+        String name = searchParameters.getNameKeyword();
+        String surname = searchParameters.getSurnameKeyword();
 
-        if (nameKeyword == null && cityKeyword == null) {
+        if (name == null && surname == null) {
             Predicate predicate = criteriaBuilder.conjunction();
             predicates.add(predicate);
         }
 
-        if (nameKeyword != null) {
-            Predicate predicateForName = criteriaBuilder.like(root.get("name"), "%" + nameKeyword + "%");
-            Predicate predicateForSurname = criteriaBuilder.like(root.get("surname"), "%" + nameKeyword + "%");
-            predicates.add(criteriaBuilder.or(predicateForName, predicateForSurname));
+        if (name != null) {
+            Predicate predicateForName = criteriaBuilder.like(root.get("name"), "%" + name + "%");
+            predicates.add(predicateForName);
         }
 
-        if (cityKeyword != null) {
-            Predicate predicateForCity = criteriaBuilder.like(root.join("address").get("city"), "%" + cityKeyword + "%");
-            Predicate predicateForCityAddress = criteriaBuilder.like(root.join("address").get("cityAddress"), "%" + cityKeyword + "%");
-            predicates.add(criteriaBuilder.or(predicateForCity, predicateForCityAddress));
+        if (surname != null) {
+            Predicate predicateForSurname = criteriaBuilder.like(root.get("surname"), "%" + name + "%");
+            predicates.add(predicateForSurname);
         }
 
         return criteriaBuilder.or(predicates.toArray(Predicate[]::new));

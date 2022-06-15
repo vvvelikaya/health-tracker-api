@@ -1,7 +1,6 @@
 package com.diploma.domain;
 
 import com.diploma.domain.enumeration.Gender;
-import com.diploma.domain.enumeration.Role;
 import lombok.*;
 
 import javax.persistence.*;
