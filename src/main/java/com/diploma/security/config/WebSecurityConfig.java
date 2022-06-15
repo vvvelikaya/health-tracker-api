@@ -33,6 +33,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.requiresChannel()
+                .requestMatchers(r -> r.getHeader("X-Forwarded-Proto") != null)
+                .requiresSecure();
         http.authorizeRequests()
                 .antMatchers("/login", "/api/users/token/refresh ").permitAll()
                 .antMatchers(GET, "api/users/**").hasAnyAuthority("ROLE_ADMIN")

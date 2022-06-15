@@ -77,10 +77,7 @@
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>${flyway-maven-plugin.version}</version>
                 <configuration>
-                    <user>postgres</user>
-                    <password>postgres</password>
-                    <defaultSchema>health_tracker</defaultSchema>
-                    <url>jdbc:postgresql://localhost:5432/health_tracker_dev</url>
+                    <url>${env.JDBC_DATABASE_URL}</url>
                 </configuration>
             </plugin>
             <plugin>
