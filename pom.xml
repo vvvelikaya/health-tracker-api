@@ -21,6 +21,7 @@
 
         <postgresql.version>42.3.6</postgresql.version>
         <flyway-maven-plugin.version>8.5.12</flyway-maven-plugin.version>
+        <maven-dependency-plugin.version>3.0.1</maven-dependency-plugin.version>
         <spring-boot.version>2.6.7</spring-boot.version>
         <lombok.version>1.18.24</lombok.version>
         <hibernate-validator.version>7.0.4.Final</hibernate-validator.version>
@@ -81,6 +82,18 @@
                     <defaultSchema>health_tracker</defaultSchema>
                     <url>jdbc:postgresql://localhost:5432/health_tracker_dev</url>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven-dependency-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals><goal>copy-dependencies</goal></goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
