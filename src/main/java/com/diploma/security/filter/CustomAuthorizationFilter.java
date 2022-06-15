@@ -15,7 +15,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,15 +25,15 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
     
-    private final static String TOKEN_PREFIX = "Bearer ";
+    public final static String TOKEN_PREFIX = "Bearer ";
     
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (request.getServletPath().equals("/login")) {
+        if (request.getServletPath().equals("/login") || request.getServletPath().equals("/api/users/token/refresh")) {
             filterChain.doFilter(request, response);
         } else {
             String authorizationHeader = request.getHeader(AUTHORIZATION);
-            if (authorizationHeader != null && authorizationHeader.startsWith( TOKEN_PREFIX)) {
+            if (authorizationHeader != null && authorizationHeader.startsWith(TOKEN_PREFIX)) {
                 try {
                     String token = authorizationHeader.substring(TOKEN_PREFIX.length());
                     Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
