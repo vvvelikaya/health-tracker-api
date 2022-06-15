@@ -1,11 +1,16 @@
 package com.diploma.web.rest;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.diploma.domain.User;
-import com.diploma.service.UserService;
 import com.diploma.service.SearchParameters;
+import com.diploma.service.UserService;
 import com.diploma.service.dto.SearchParametersDTO;
 import com.diploma.web.rest.errors.ProcessException;
 import com.diploma.web.rest.util.HeaderUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,11 +19,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+
+import static com.diploma.security.filter.CustomAuthorizationFilter.TOKEN_PREFIX;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
  * REST controller for managing {@link User}.
@@ -47,15 +59,15 @@ public class UserResource {
         }
         User result = userService.create(user);
         return ResponseEntity
-            .created(new URI("/api/users/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
-            .body(result);
+                .created(new URI("/api/users/" + result.getId()))
+                .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
+                .body(result);
     }
 
     /**
      * {@code PUT  /:id} : Updates an existing user.
      *
-     * @param id the id of the userDTO to save.
+     * @param id   the id of the userDTO to save.
      * @param user the userDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated userDTO,
      * or with status {@code 400 (Bad Request)} if the userDTO is not valid,
@@ -75,9 +87,9 @@ public class UserResource {
         }
         User result = userService.update(user);
         return ResponseEntity
-            .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, user.getId().toString()))
-            .body(result);
+                .ok()
+                .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, user.getId().toString()))
+                .body(result);
     }
 
     /**
@@ -118,8 +130,51 @@ public class UserResource {
         log.debug("REST request to delete User : {}", id);
         userService.delete(id);
         return ResponseEntity
-            .noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString()))
-            .build();
+                .noContent()
+                .headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString()))
+                .build();
+    }
+
+    @GetMapping("/token/refresh")
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String authorizationHeader = request.getHeader(AUTHORIZATION);
+        if (authorizationHeader != null && authorizationHeader.startsWith(TOKEN_PREFIX)) {
+            try {
+                String refresh_token = authorizationHeader.substring(TOKEN_PREFIX.length());
+                Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
+                JWTVerifier verifier = JWT.require(algorithm).build();
+                DecodedJWT decodedJWT = verifier.verify(refresh_token);
+                String username = decodedJWT.getSubject();
+                User user = userService.getUserByEmail(username).orElseThrow(() -> new RuntimeException("No user with such email: " + username));
+
+
+                String accessToken = JWT.create()
+                        .withSubject(user.getEmail())
+                        .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
+                        .withIssuer(request.getRequestURI())
+                        .withClaim("role", user.getRole())
+                        .sign(algorithm);
+                String refreshToken = JWT.create()
+                        .withSubject(user.getEmail())
+                        .withExpiresAt(new Date(System.currentTimeMillis() + 30 * 60 * 1000))
+                        .withIssuer(request.getRequestURI())
+                        .withClaim("role", user.getRole())
+                        .sign(algorithm);
+                Map<String, String> tokens = new HashMap<>();
+                tokens.put("access_token", accessToken);
+                tokens.put("refresh_token", refreshToken);
+                response.setContentType(APPLICATION_JSON_VALUE);
+                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+            } catch (Exception e) {
+                response.setHeader("error", e.getMessage());
+                response.setStatus(FORBIDDEN.value());
+                Map<String, String> error = new HashMap<>();
+                error.put("error_message", e.getMessage());
+                response.setContentType(APPLICATION_JSON_VALUE);
+                new ObjectMapper().writeValue(response.getOutputStream(), error);
+            }
+        } else {
+            throw new RuntimeException("No bearer authorization header with refresh token");
+        }
     }
 }
