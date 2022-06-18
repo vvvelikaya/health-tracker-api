@@ -13,14 +13,14 @@ public class HealthTrackerApi {
         SpringApplication.run(HealthTrackerApi.class, args);
     }
 
-//    @Bean
-//    CommandLineRunner run(UserService userService) {
-//        return args -> userService.create(User.builder()
-//                        .name("John")
-//                        .surname("Smith")
-//                        .email("john@gmail.com")
-//                        .password("12345")
-//                        .role("ROLE_USER")
-//                .build());
-//    }
+    @Bean
+    CommandLineRunner run(UserService userService) {
+        return args -> userService.create(User.builder()
+                        .name("John")
+                        .surname("Smith")
+                        .email("john@gmail.com")
+                        .password("12345")
+                        .role("ROLE_USER")
+                .build());
+    }
 }
