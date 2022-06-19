@@ -30,8 +30,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable()
+        http.csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.requiresChannel()
                 .requestMatchers(r -> r.getHeader("X-Forwarded-Proto") != null)
@@ -39,7 +38,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers("/login", "/api/users/token/refresh ").permitAll()
                 .antMatchers(GET, "api/users/**").hasAnyAuthority("ROLE_ADMIN")
-//                .antMatchers("api/users/**").hasAnyAuthority("ROLE_USER")
                 .anyRequest().authenticated();
         http
                 .addFilter(new CustomAuthenticationFilter(super.authenticationManager()))
