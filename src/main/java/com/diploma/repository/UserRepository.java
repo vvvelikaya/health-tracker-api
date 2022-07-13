@@ -12,5 +12,5 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
-    Optional<User> findOneUserByEmail(String email);
+    Optional<User> findUserByEmail(String email);
 }

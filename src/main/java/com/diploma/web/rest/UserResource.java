@@ -27,7 +27,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 
-import static com.diploma.security.filter.CustomAuthorizationFilter.TOKEN_PREFIX;
+import static com.diploma.security.filter.AuthorizationFilter.TOKEN_PREFIX;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
